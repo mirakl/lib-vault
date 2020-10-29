@@ -138,7 +138,7 @@ func TestListSecret(t *testing.T) {
 	client, err := CreateClient()
 	require.NoError(t, err, "This should not fail")
 
-	secrets, err := client.ListSecret("secret")
+	secrets, err := client.ListSecrets("secret")
 	require.NoError(t, err)
 	require.Equal(t, 3, len(secrets))
 

@@ -50,7 +50,7 @@ func CreateClient() (*VaultClient, error) {
 	return &VaultClient{client.Logical()}, nil
 }
 
-func (vc *VaultClient) ListSecret(path string) ([]string, error) {
+func (vc *VaultClient) ListSecrets(path string) ([]string, error) {
 	s, err := vc.client.List(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list vault secrets: %w", err)
