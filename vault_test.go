@@ -1,11 +1,12 @@
 package lib_vault
 
 import (
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/http"
