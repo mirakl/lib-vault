@@ -9,7 +9,7 @@ test:
 	go test
 
 check: setup
-	bin/golangci-lint run
+	bin/golangci-lint run --timeout=600s
 
 setup: ./bin/golangci-lint
 
