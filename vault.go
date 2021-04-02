@@ -98,7 +98,7 @@ func (vc *VaultClient) ReadSecret(path string, field string) (string, error) {
 	return convertedValue, nil
 }
 
-func (vc *VaultClient) ReadSecretV2(path string, field string) (string, error) {
+func (vc *VaultClient) ReadSecretKvV2(path string, field string) (string, error) {
 	v2Path := kvV2Path(path, "data")
 	secret, err := vc.client.Read(v2Path)
 	if err != nil {
@@ -122,7 +122,7 @@ func (vc *VaultClient) ReadSecretV2(path string, field string) (string, error) {
 	return convertedValue, nil
 }
 
-func (vc *VaultClient) ListSecretPathV2(path string) ([]string, error) {
+func (vc *VaultClient) ListSecretPathKvV2(path string) ([]string, error) {
 	v2Path := kvV2Path(path, "metadata")
 
 	s, err := vc.client.List(v2Path)

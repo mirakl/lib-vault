@@ -204,11 +204,11 @@ func TestReadSecretV2(t *testing.T) {
 		},
 	})
 
-	s, err := client.ReadSecretV2("secret/foo", "secret")
+	s, err := client.ReadSecretKvV2("secret/foo", "secret")
 	require.NoError(t, err)
 	require.Equal(t, "bar", s)
 
-	_, err = client.ReadSecretV2("secret/anything", "secret")
+	_, err = client.ReadSecretKvV2("secret/anything", "secret")
 	require.Error(t, err, "no exist secret \"secret/anything\"")
 }
 
@@ -238,7 +238,7 @@ func TestListSecretV2(t *testing.T) {
 		},
 	})
 
-	secrets, err := client.ListSecretPathV2("secret")
+	secrets, err := client.ListSecretPathKvV2("secret")
 	require.NoError(t, err)
 	require.Equal(t, 3, len(secrets))
 
