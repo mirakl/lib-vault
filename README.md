@@ -35,17 +35,17 @@ client.ListSecretPath("secret/foo/bar")
 
 Read secret (kv v2), returns the secret value
 ```
-client.ReadSecretV2("path", "field")
+client.ReadSecretKvV2("path", "field")
 ```
 
 List secret paths (kv v2), returns absolute secret path from base path.
 ```
-client.ListSecretPathV2("basepath")
+client.ListSecretPathKvV2("basepath")
 ```
 
 example:
 ```
-client.ListSecretPathV2("secret/foo/bar")
+client.ListSecretPathKvV2("secret/foo/bar")
 
  secret/foo/bar/foo1
  secret/foo/bar/foo2
