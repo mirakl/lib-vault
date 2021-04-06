@@ -1,6 +1,6 @@
 # lib-vault
 
-This lib provides some methods to deal with vault's golang client
+This lib provides some methods to deal with vault's (kv v1 or v2) golang client
 
 ## How it works
 
@@ -10,19 +10,19 @@ or `.vault-token` file in your home directory
 client, err := CreateClient()
 ```
 
-Read secret, returns the secret value
+Read secret (kv v1), returns the secret value
 ```
 client.ReadSecret("path", "field")
 ```
 
-List secret paths, returns absolute secret path from base path.
+List secret paths (kv v1), returns absolute secret path from base path.
 ```
-client.ListSecrets("basepath")
+client.ListSecretPath("basepath")
 ```
 
 example:
 ```
-client.ListSecrets("secret/foo/bar")
+client.ListSecretPath("secret/foo/bar")
 
  secret/foo/bar/foo1
  secret/foo/bar/foo2
@@ -33,3 +33,25 @@ client.ListSecrets("secret/foo/bar")
 
 ```
 
+Read secret (kv v2), returns the secret value
+```
+client.ReadSecretKvV2("path", "field")
+```
+
+List secret paths (kv v2), returns absolute secret path from base path.
+```
+client.ListSecretPathKvV2("basepath")
+```
+
+example:
+```
+client.ListSecretPathKvV2("secret/foo/bar")
+
+ secret/foo/bar/foo1
+ secret/foo/bar/foo2
+ secret/foo/bar/foo3
+ secret/foo/bar/foo4
+ secret/foo/bar/foo5
+ ...
+
+```

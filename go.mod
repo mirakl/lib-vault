@@ -1,12 +1,12 @@
 module github.com/mirakl/lib-vault
 
-go 1.15
+go 1.16
 
 require (
-	github.com/hashicorp/vault v1.3.2
-	github.com/hashicorp/vault/api v1.0.5-0.20200117231345-460d63e36490
+	github.com/hashicorp/vault v1.7.0
+	github.com/hashicorp/vault/api v1.1.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pkg/errors v0.8.1
-	github.com/stretchr/testify v1.3.0
-	golang.org/x/tools v0.0.0-20201030143252-cf7a54d06671 // indirect
+	github.com/ory/dockertest/v3 v3.6.2 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.6.1
 )

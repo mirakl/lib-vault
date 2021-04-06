@@ -1,10 +1,11 @@
-package lib_vault
+package libvault
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	vault "github.com/hashicorp/vault/api"
 	"github.com/mitchellh/go-homedir"
@@ -50,10 +51,14 @@ func CreateClient() (*VaultClient, error) {
 	return &VaultClient{client.Logical()}, nil
 }
 
-func (vc *VaultClient) ListSecrets(path string) ([]string, error) {
+func (vc *VaultClient) ListSecretPath(path string) ([]string, error) {
 	s, err := vc.client.List(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list vault secrets: %w", err)
+		return nil, errors.Wrap(err, "failed to list vault secrets")
+	}
+
+	if s == nil {
+		return nil, errors.Errorf("The path %q does not exist", path)
 	}
 
 	secrets := s.Data["keys"]
@@ -95,4 +100,62 @@ func (vc *VaultClient) ReadSecret(path string, field string) (string, error) {
 	}
 
 	return convertedValue, nil
+}
+
+func (vc *VaultClient) ReadSecretKvV2(path string, field string) (string, error) {
+	v2Path := kvV2Path(path, "data")
+	secret, err := vc.client.Read(v2Path)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to read secret %q", path)
+	}
+
+	if secret == nil {
+		return "", errors.Errorf("No secret exist for this path %q", path)
+	}
+
+	m, ok := secret.Data["data"].(map[string]interface{})
+	if !ok {
+		return "", errors.Errorf("Incompatible type %q key does not exist, %T %#v", "data", secret.Data["data"], secret.Data["data"])
+	}
+
+	convertedValue, ok := m[field].(string)
+	if !ok {
+		return "", errors.Errorf("field %q does not exist for this secret %q", field, path)
+	}
+
+	return convertedValue, nil
+}
+
+func (vc *VaultClient) ListSecretPathKvV2(path string) ([]string, error) {
+	v2Path := kvV2Path(path, "metadata")
+
+	s, err := vc.client.List(v2Path)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list vault secrets")
+	}
+
+	if s == nil {
+		return nil, errors.Errorf("The path %q does not exist", path)
+	}
+
+	secrets := s.Data["keys"]
+	var result []string
+	t, ok := secrets.([]interface{})
+	if !ok {
+		return nil, errors.New("Incompatible type")
+	}
+
+	for _, value := range t {
+		f := fmt.Sprintf("%v/%v", path, value)
+		result = append(result, f)
+	}
+
+	return result, nil
+}
+
+func kvV2Path(path string, key string) string {
+	if !strings.HasSuffix(path, "/") {
+		path = path + "/"
+	}
+	return strings.Replace(path, "/", "/"+key+"/", 1)
 }
