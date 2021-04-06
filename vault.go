@@ -57,6 +57,10 @@ func (vc *VaultClient) ListSecretPath(path string) ([]string, error) {
 		return nil, errors.Wrap(err, "failed to list vault secrets")
 	}
 
+	if s == nil {
+		return nil, errors.Errorf("The path %q does not exist", path)
+	}
+
 	secrets := s.Data["keys"]
 
 	var result []string
@@ -128,6 +132,10 @@ func (vc *VaultClient) ListSecretPathKvV2(path string) ([]string, error) {
 	s, err := vc.client.List(v2Path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list vault secrets")
+	}
+
+	if s == nil {
+		return nil, errors.Errorf("The path %q does not exist", path)
 	}
 
 	secrets := s.Data["keys"]

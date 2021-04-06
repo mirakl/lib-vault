@@ -188,6 +188,9 @@ func TestListSecret(t *testing.T) {
 	require.Equal(t, 3, len(secrets))
 
 	require.Equal(t, []string{"secret/foo", "secret/foo1", "secret/foo2"}, secrets)
+
+	secrets, err = client.ListSecretPath("secret/not_exist")
+	require.Error(t, err, "The path \"secret/not_exist\" does not exist")
 }
 
 func TestReadSecretV2(t *testing.T) {
@@ -243,4 +246,7 @@ func TestListSecretV2(t *testing.T) {
 	require.Equal(t, 3, len(secrets))
 
 	require.Equal(t, []string{"secret/foo", "secret/foo1", "secret/foo2"}, secrets)
+
+	secrets, err = client.ListSecretPathKvV2("secret/not_exist")
+	require.Error(t, err, "The path \"secret/not_exist\" does not exist")
 }
