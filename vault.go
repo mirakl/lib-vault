@@ -80,12 +80,12 @@ func (vc *VaultClient) ListSecretPath(path string) ([]string, error) {
 func (vc *VaultClient) ReadSecret(path string, field string) (string, error) {
 	secret, err := vc.GetSecret(path)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read secret %q", path)
+		return "", errors.Wrapf(err, "failed to read secret in %q", path)
 	}
 
 	value, found := secret[field]
 	if !found {
-		return "", errors.Errorf("no field %q for secret %q", field, path)
+		return "", errors.Errorf("no field %q for secret in %q", field, path)
 	}
 
 	convertedValue, ok := value.(string)
@@ -102,11 +102,11 @@ func (vc *VaultClient) ReadSecret(path string, field string) (string, error) {
 func (vc *VaultClient) GetSecret(path string) (map[string]interface{}, error) {
 	secret, err := vc.client.Read(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read secret %q", path)
+		return nil, errors.Wrapf(err, "failed to read secret in %q", path)
 	}
 
 	if secret == nil {
-		return nil, errors.Errorf("no exist secret %q", path)
+		return nil, errors.Errorf("no existing secret in %q", path)
 	}
 
 	return secret.Data, nil
@@ -115,7 +115,7 @@ func (vc *VaultClient) GetSecret(path string) (map[string]interface{}, error) {
 func (vc *VaultClient) ReadSecretKvV2(path string, field string) (string, error) {
 	secret, err := vc.GetSecretKvV2(path)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read secret %q", path)
+		return "", errors.Wrapf(err, "failed to read secret in %q", path)
 	}
 
 	convertedValue, ok := secret[field].(string)
@@ -130,11 +130,11 @@ func (vc *VaultClient) GetSecretKvV2(path string) (map[string]interface{}, error
 	v2Path := kvV2Path(path, "data")
 	secret, err := vc.client.Read(v2Path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read secret %q", path)
+		return nil, errors.Wrapf(err, "failed to read secret in %q", path)
 	}
 
 	if secret == nil {
-		return nil, errors.Errorf("No secret exist for this path %q", path)
+		return nil, errors.Errorf("No secret exists in %q", path)
 	}
 
 	m, ok := secret.Data["data"].(map[string]interface{})
