@@ -15,6 +15,11 @@ Read secret (kv v1), returns the secret value
 client.ReadSecret("path", "field")
 ```
 
+Get secret (kv v1), returns the secret (map[string]interface{})
+```
+client.GetSecret("path")
+```
+
 List secret paths (kv v1), returns absolute secret path from base path.
 ```
 client.ListSecretPath("basepath")
@@ -36,6 +41,11 @@ client.ListSecretPath("secret/foo/bar")
 Read secret (kv v2), returns the secret value
 ```
 client.ReadSecretKvV2("path", "field")
+```
+
+Get secret (kv v2), returns the secret (map[string]interface{})
+```
+client.GetSecretKvV2("path")
 ```
 
 List secret paths (kv v2), returns absolute secret path from base path.

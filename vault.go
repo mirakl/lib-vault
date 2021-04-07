@@ -78,52 +78,71 @@ func (vc *VaultClient) ListSecretPath(path string) ([]string, error) {
 }
 
 func (vc *VaultClient) ReadSecret(path string, field string) (string, error) {
-	secret, err := vc.client.Read(path)
+	secret, err := vc.GetSecret(path)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to read secret %q", path)
 	}
-	if secret == nil {
-		return "", errors.Errorf("no exist secret %q", path)
-	}
 
-	value, found := secret.Data[field]
+	value, found := secret[field]
 	if !found {
-		return "", errors.Errorf("no field %q for secret %q", field, secret.WrapInfo.CreationPath)
+		return "", errors.Errorf("no field %q for secret %q", field, path)
 	}
 
 	convertedValue, ok := value.(string)
 	if !ok {
-		return "", errors.Errorf("secret %q in %q has type %T = %v", field, secret.WrapInfo.CreationPath, value, value)
+		return "", errors.Errorf("secret %q in %q has type %T = %v", field, path, value, value)
 	}
 	if convertedValue == "" {
-		return "", errors.Errorf("value is empty for field %q in %q", field, secret.WrapInfo.CreationPath)
+		return "", errors.Errorf("value is empty for field %q in %q", field, path)
 	}
 
 	return convertedValue, nil
 }
 
+func (vc *VaultClient) GetSecret(path string) (map[string]interface{}, error) {
+	secret, err := vc.client.Read(path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to read secret %q", path)
+	}
+
+	if secret == nil {
+		return nil, errors.Errorf("no exist secret %q", path)
+	}
+
+	return secret.Data, nil
+}
+
 func (vc *VaultClient) ReadSecretKvV2(path string, field string) (string, error) {
-	v2Path := kvV2Path(path, "data")
-	secret, err := vc.client.Read(v2Path)
+	secret, err := vc.GetSecretKvV2(path)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to read secret %q", path)
 	}
 
-	if secret == nil {
-		return "", errors.Errorf("No secret exist for this path %q", path)
-	}
-
-	m, ok := secret.Data["data"].(map[string]interface{})
-	if !ok {
-		return "", errors.Errorf("Incompatible type %q key does not exist, %T %#v", "data", secret.Data["data"], secret.Data["data"])
-	}
-
-	convertedValue, ok := m[field].(string)
+	convertedValue, ok := secret[field].(string)
 	if !ok {
 		return "", errors.Errorf("field %q does not exist for this secret %q", field, path)
 	}
 
 	return convertedValue, nil
+}
+
+func (vc *VaultClient) GetSecretKvV2(path string) (map[string]interface{}, error) {
+	v2Path := kvV2Path(path, "data")
+	secret, err := vc.client.Read(v2Path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to read secret %q", path)
+	}
+
+	if secret == nil {
+		return nil, errors.Errorf("No secret exist for this path %q", path)
+	}
+
+	m, ok := secret.Data["data"].(map[string]interface{})
+	if !ok {
+		return nil, errors.Errorf("Incompatible type %q key does not exist, %T %#v", "data", secret.Data["data"], secret.Data["data"])
+	}
+
+	return m, nil
 }
 
 func (vc *VaultClient) ListSecretPathKvV2(path string) ([]string, error) {

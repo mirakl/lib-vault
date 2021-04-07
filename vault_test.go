@@ -50,7 +50,9 @@ func createTestVault(t *testing.T) (string, string) {
 
 	// Setup required secrets, policies, etc.
 	_, err = client.Logical().Write("secret/foo", map[string]interface{}{
-		"secret": "bar",
+		"secret":  "bar",
+		"secret2": "bar2",
+		"secret3": "bar3",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -249,4 +251,46 @@ func TestListSecretV2(t *testing.T) {
 
 	_, err = client.ListSecretPathKvV2("secret/not_exist")
 	require.Error(t, err, "The path \"secret/not_exist\" does not exist")
+}
+
+func TestGetSecret(t *testing.T) {
+	addr, token := createTestVault(t)
+
+	os.Clearenv()
+	os.Setenv("VAULT_ADDR", addr)
+	os.Setenv("VAULT_TOKEN", token)
+
+	client, err := CreateClient()
+	require.NoError(t, err)
+
+	s, err := client.GetSecret("secret/foo")
+	require.NoError(t, err)
+
+	require.Equal(t, "bar", s["secret"])
+	require.Equal(t, "bar2", s["secret2"])
+	require.Equal(t, "bar3", s["secret3"])
+}
+
+func TestGetSecretKvV2(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("VAULT_ADDR", v2Endpoint)
+	os.Setenv("VAULT_TOKEN", "root")
+
+	client, err := CreateClient()
+	require.NoError(t, err, "This should not fail")
+
+	addSecret(t, client, "secret/data/foo", map[string]interface{}{
+		"data": map[string]interface{}{
+			"secret":  "bar",
+			"secret2": "bar2",
+			"secret3": "bar3",
+		},
+	})
+
+	s, err := client.GetSecretKvV2("secret/foo")
+	require.NoError(t, err)
+
+	require.Equal(t, "bar", s["secret"])
+	require.Equal(t, "bar2", s["secret2"])
+	require.Equal(t, "bar3", s["secret3"])
 }
