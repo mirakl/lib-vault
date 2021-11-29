@@ -4,9 +4,9 @@ go 1.16
 
 require (
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
-	github.com/containerd/containerd v1.4.10 // indirect
+	github.com/containerd/containerd v1.4.12 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
-	github.com/hashicorp/vault v1.8.3
+	github.com/hashicorp/vault v1.8.4
 	github.com/hashicorp/vault/api v1.1.2-0.20210713235431-1fc8af4c041f
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
@@ -20,6 +20,6 @@ require (
 	golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
-	golang.org/x/tools v0.1.5 // indirect
+	golang.org/x/tools v0.1.7 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
