@@ -1,4 +1,4 @@
-package libvault
+package v2
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/mirakl/lib-vault/libvault"
 	"github.com/mitchellh/go-homedir"
 	"github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/require"
@@ -48,8 +49,8 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func addSecret(t *testing.T, vClient *VaultClient, path string, values map[string]interface{}) {
-	_, err := vClient.client.Write(path, values)
+func addSecret(t *testing.T, client *v2Client, path string, values map[string]interface{}) {
+	_, err := client.Client.Logical().Write(path, values)
 	require.NoError(t, err)
 }
 
@@ -58,7 +59,7 @@ func TestCreateClientTokenFromEnv(t *testing.T) {
 	os.Setenv("VAULT_ADDR", v2Endpoint)
 	os.Setenv("VAULT_TOKEN", "root")
 
-	_, err := CreateClient()
+	_, err := libvault.CreateClient()
 	require.NoError(t, err, "This should not fail")
 }
 
@@ -66,7 +67,7 @@ func TestCreateClientTokenFromFile(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("VAULT_ADDR", v2Endpoint)
 
-	_, err := CreateClient()
+	_, err := libvault.CreateClient()
 	require.Error(t, err, "Couldn't find neither $VAULT_TOKEN nor ~/.vault-token file")
 
 	tmpdir, err := ioutil.TempDir("", "vaultread_test")
@@ -88,7 +89,7 @@ func TestCreateClientTokenFromFile(t *testing.T) {
 		t.Fatalf("unable to write file : %q", tokenPath)
 	}
 
-	_, err = CreateClient()
+	_, err = libvault.CreateClient()
 	require.NoError(t, err, "This should not fail")
 }
 
@@ -106,11 +107,11 @@ func TestReadSecretV2(t *testing.T) {
 		},
 	})
 
-	s, err := client.ReadSecretKvV2("secret/foo", "secret")
+	s, err := client.ReadSecret("secret/foo", "secret")
 	require.NoError(t, err)
 	require.Equal(t, "bar", s)
 
-	_, err = client.ReadSecretKvV2("secret/anything", "secret")
+	_, err = client.ReadSecret("secret/anything", "secret")
 	require.Error(t, err, "no exist secret \"secret/anything\"")
 }
 
@@ -140,13 +141,13 @@ func TestListSecretV2(t *testing.T) {
 		},
 	})
 
-	secrets, err := client.ListSecretPathKvV2("secret")
+	secrets, err := client.ListSecretPath("secret")
 	require.NoError(t, err)
 	require.Equal(t, 3, len(secrets))
 
 	require.Equal(t, []string{"secret/foo", "secret/foo1", "secret/foo2"}, secrets)
 
-	_, err = client.ListSecretPathKvV2("secret/not_exist")
+	_, err = client.ListSecretPath("secret/not_exist")
 	require.Error(t, err, "The path \"secret/not_exist\" does not exist")
 }
 
@@ -166,7 +167,7 @@ func TestGetSecretKvV2(t *testing.T) {
 		},
 	})
 
-	s, err := client.GetSecretKvV2("secret/foo")
+	s, err := client.GetSecret("secret/foo")
 	require.NoError(t, err)
 
 	require.Equal(t, "bar", s["secret"])
