@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func addSecret(t *testing.T, client *v1Client, path string, values map[string]interface{}) {
+func addSecret(t *testing.T, client *Client, path string, values map[string]interface{}) {
 	_, err := client.Client.Logical().Write(path, values)
 	require.NoError(t, err)
 }

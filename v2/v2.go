@@ -9,22 +9,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-type v2Client struct {
+type Client struct {
 	Client *vault.Client
 }
 
-func CreateClient() (*v2Client, error) {
+func CreateClient() (*Client, error) {
 	client, err := libvault.CreateClient()
 	if err != nil {
 		return nil, errors.Wrapf(err, "")
 	}
 
-	return &v2Client{
+	return &Client{
 		Client: client,
 	}, nil
 }
 
-func (vc *v2Client) ReadSecret(path string, field string) (string, error) {
+func (vc *Client) ReadSecret(path string, field string) (string, error) {
 	secret, err := vc.GetSecret(path)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to read secret in %q", path)
@@ -38,7 +38,7 @@ func (vc *v2Client) ReadSecret(path string, field string) (string, error) {
 	return convertedValue, nil
 }
 
-func (vc *v2Client) GetSecret(path string) (map[string]interface{}, error) {
+func (vc *Client) GetSecret(path string) (map[string]interface{}, error) {
 	v2Path := kvV2Path(path, "data")
 	secret, err := vc.Client.Logical().Read(v2Path)
 	if err != nil {
@@ -57,7 +57,7 @@ func (vc *v2Client) GetSecret(path string) (map[string]interface{}, error) {
 	return m, nil
 }
 
-func (vc *v2Client) ListSecretPath(path string) ([]string, error) {
+func (vc *Client) ListSecretPath(path string) ([]string, error) {
 	v2Path := kvV2Path(path, "metadata")
 
 	s, err := vc.Client.Logical().List(v2Path)

@@ -8,22 +8,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-type v1Client struct {
+type Client struct {
 	Client *vault.Client
 }
 
-func CreateClient() (*v1Client, error) {
+func CreateClient() (*Client, error) {
 	client, err := libvault.CreateClient()
 	if err != nil {
 		return nil, errors.Wrapf(err, "")
 	}
 
-	return &v1Client{
+	return &Client{
 		Client: client,
 	}, nil
 }
 
-func (vc *v1Client) ListSecretPath(path string) ([]string, error) {
+func (vc *Client) ListSecretPath(path string) ([]string, error) {
 	s, err := vc.Client.Logical().List(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list vault secrets")
@@ -49,7 +49,7 @@ func (vc *v1Client) ListSecretPath(path string) ([]string, error) {
 	return result, nil
 }
 
-func (vc *v1Client) ReadSecret(path string, field string) (string, error) {
+func (vc *Client) ReadSecret(path string, field string) (string, error) {
 	secret, err := vc.GetSecret(path)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to read secret in %q", path)
@@ -71,7 +71,7 @@ func (vc *v1Client) ReadSecret(path string, field string) (string, error) {
 	return convertedValue, nil
 }
 
-func (vc *v1Client) GetSecret(path string) (map[string]interface{}, error) {
+func (vc *Client) GetSecret(path string) (map[string]interface{}, error) {
 	secret, err := vc.Client.Logical().Read(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to read secret in %q", path)

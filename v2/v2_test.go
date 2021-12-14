@@ -49,7 +49,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func addSecret(t *testing.T, client *v2Client, path string, values map[string]interface{}) {
+func addSecret(t *testing.T, client *Client, path string, values map[string]interface{}) {
 	_, err := client.Client.Logical().Write(path, values)
 	require.NoError(t, err)
 }
@@ -59,7 +59,7 @@ func TestCreateClientTokenFromEnv(t *testing.T) {
 	os.Setenv("VAULT_ADDR", v2Endpoint)
 	os.Setenv("VAULT_TOKEN", "root")
 
-	_, err := libvault.CreateClient()
+	_, err := CreateClient()
 	require.NoError(t, err, "This should not fail")
 }
 
@@ -67,7 +67,7 @@ func TestCreateClientTokenFromFile(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("VAULT_ADDR", v2Endpoint)
 
-	_, err := libvault.CreateClient()
+	_, err := CreateClient()
 	require.Error(t, err, "Couldn't find neither $VAULT_TOKEN nor ~/.vault-token file")
 
 	tmpdir, err := ioutil.TempDir("", "vaultread_test")
