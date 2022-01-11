@@ -6,7 +6,7 @@ fmt: goimports
 	goimports -w .
 
 test:
-	go test
+	go test ./... -v
 
 check: setup
 	bin/golangci-lint run --timeout=600s
