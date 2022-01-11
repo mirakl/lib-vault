@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mirakl/lib-vault/internal/libvault"
+	"github.com/mirakl/lib-vault/v2/internal/libvault"
 	"github.com/mitchellh/go-homedir"
 	"github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/require"
