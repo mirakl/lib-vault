@@ -1,4 +1,4 @@
-package v2
+package vaultv2
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mirakl/lib-vault/libvault"
+	"github.com/mirakl/lib-vault/internal/libvault"
 	"github.com/mitchellh/go-homedir"
 	"github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/require"

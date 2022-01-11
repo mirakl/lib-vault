@@ -4,58 +4,50 @@ This lib provides some methods to deal with vault's (kv v1 or v2) golang client
 
 ## How it works
 
-Create new client, the creation depends on existing of either  **VAULT_TOKEN** environment variable 
-or `.vault-token` file in your home directory 
+Create new client, the creation depends on existing of either  **VAULT_TOKEN** environment variable
+or `.vault-token` file in your home directory.
+
+You have to choose between using vault KV API v1 or v2:
+
+For KV v1:
+
+```go
+
+import "github.com/mirakl/lib-vault/vaultv1"
+
+client, err := vaultv1.CreateClient()
 ```
-client, err := CreateClient()
+For KV v2:
+
+```go
+
+import "github.com/mirakl/lib-vault/vaultv2"
+
+client, err := vaultv2.CreateClient()
 ```
 
-Read secret (kv v1), returns the secret value
-```
+Both clients expose the same set of methods:
+
+
+Read secret returns the secret value
+```go
 client.ReadSecret("path", "field")
 ```
 
-Get secret (kv v1), returns the secret (map[string]interface{})
-```
+Get secret returns the secret (map[string]interface{})
+```go
 client.GetSecret("path")
 ```
 
-List secret paths (kv v1), returns absolute secret path from base path.
-```
+List secret paths returns absolute secret path from base path.
+```go
 client.ListSecretPath("basepath")
 ```
+
 
 example:
 ```
 client.ListSecretPath("secret/foo/bar")
-
- secret/foo/bar/foo1
- secret/foo/bar/foo2
- secret/foo/bar/foo3
- secret/foo/bar/foo4
- secret/foo/bar/foo5
- ...
-
-```
-
-Read secret (kv v2), returns the secret value
-```
-client.ReadSecretKvV2("path", "field")
-```
-
-Get secret (kv v2), returns the secret (map[string]interface{})
-```
-client.GetSecretKvV2("path")
-```
-
-List secret paths (kv v2), returns absolute secret path from base path.
-```
-client.ListSecretPathKvV2("basepath")
-```
-
-example:
-```
-client.ListSecretPathKvV2("secret/foo/bar")
 
  secret/foo/bar/foo1
  secret/foo/bar/foo2

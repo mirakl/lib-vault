@@ -1,10 +1,10 @@
-package v1
+package vaultv1
 
 import (
 	"fmt"
 
 	vault "github.com/hashicorp/vault/api"
-	"github.com/mirakl/lib-vault/libvault"
+	"github.com/mirakl/lib-vault/internal/libvault"
 	"github.com/pkg/errors"
 )
 

@@ -1,11 +1,11 @@
-package v2
+package vaultv2
 
 import (
 	"fmt"
 	"strings"
 
 	vault "github.com/hashicorp/vault/api"
-	"github.com/mirakl/lib-vault/libvault"
+	"github.com/mirakl/lib-vault/internal/libvault"
 	"github.com/pkg/errors"
 )
 

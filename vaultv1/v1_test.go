@@ -1,4 +1,4 @@
-package v1
+package vaultv1_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	vault "github.com/hashicorp/vault/api"
+	"github.com/mirakl/lib-vault/vaultv1"
 	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 )
@@ -47,7 +48,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func addSecret(t *testing.T, client *Client, path string, values map[string]interface{}) {
+func addSecret(t *testing.T, client *vaultv1.Client, path string, values map[string]interface{}) {
 	_, err := client.Client.Logical().Write(path, values)
 	require.NoError(t, err)
 }
@@ -57,7 +58,7 @@ func TestReadSecret(t *testing.T) {
 	os.Setenv("VAULT_ADDR", v1Endpoint)
 	os.Setenv("VAULT_TOKEN", "root")
 
-	client, err := CreateClient()
+	client, err := vaultv1.CreateClient()
 	require.NoError(t, err, "This should not fail")
 	err = client.Client.Sys().Mount("kv-v1", &vault.MountInput{
 		Type:    "kv",
@@ -79,7 +80,7 @@ func TestListSecret(t *testing.T) {
 	os.Setenv("VAULT_ADDR", v1Endpoint)
 	os.Setenv("VAULT_TOKEN", "root")
 
-	client, err := CreateClient()
+	client, err := vaultv1.CreateClient()
 	require.NoError(t, err, "This should not fail")
 	err = client.Client.Sys().Mount("kv-v1-2", &vault.MountInput{
 		Type:    "kv",
