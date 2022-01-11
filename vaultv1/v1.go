@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	vault "github.com/hashicorp/vault/api"
-	"github.com/mirakl/lib-vault/internal/libvault"
+	"github.com/mirakl/lib-vault/v2/internal/libvault"
 	"github.com/pkg/errors"
 )
 

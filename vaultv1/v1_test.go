@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	vault "github.com/hashicorp/vault/api"
-	"github.com/mirakl/lib-vault/vaultv1"
+	"github.com/mirakl/lib-vault/v2/vaultv1"
 	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 )

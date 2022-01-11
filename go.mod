@@ -1,4 +1,4 @@
-module github.com/mirakl/lib-vault
+module github.com/mirakl/lib-vault/v2
 
 go 1.16
 

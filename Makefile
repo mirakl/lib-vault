@@ -8,6 +8,10 @@ fmt: goimports
 test:
 	go test ./... -v
 
+upgrade:
+	go install github.com/marwan-at-work/mod/cmd/mod@latest
+	mod upgrade
+
 check: setup
 	bin/golangci-lint run --timeout=600s
 
