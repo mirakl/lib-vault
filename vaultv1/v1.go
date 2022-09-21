@@ -23,6 +23,17 @@ func CreateClient() (*Client, error) {
 	}, nil
 }
 
+func CreateClientWithAppRole(roleID, secretID string) (*Client, error) {
+	client, err := libvault.CreateClientWithAppRole(roleID, secretID)
+	if err != nil {
+		return nil, errors.Wrapf(err, "")
+	}
+
+	return &Client{
+		Client: client,
+	}, nil
+}
+
 func (vc *Client) ListSecretPath(path string) ([]string, error) {
 	s, err := vc.Client.Logical().List(path)
 	if err != nil {

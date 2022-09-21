@@ -2,15 +2,16 @@ package vaultv2
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
+	vault "github.com/hashicorp/vault/api"
+
 	"github.com/mirakl/lib-vault/v2/internal/libvault"
 	"github.com/mitchellh/go-homedir"
-	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -70,11 +71,7 @@ func TestCreateClientTokenFromFile(t *testing.T) {
 	_, err := CreateClient()
 	require.Error(t, err, "Couldn't find neither $VAULT_TOKEN nor ~/.vault-token file")
 
-	tmpdir, err := ioutil.TempDir("", "vaultread_test")
-	if err != nil {
-		t.Fatalf("unable to create tmpdir %q : %q", tmpdir, err)
-	}
-
+	tmpdir := os.TempDir()
 	t.Cleanup(func() {
 		os.RemoveAll(tmpdir)
 	})
@@ -85,7 +82,7 @@ func TestCreateClientTokenFromFile(t *testing.T) {
 		t.Fatalf("error getting user's home directory %q : %q", homePath, err)
 	}
 	tokenPath := filepath.Join(homePath, ".vault-token")
-	if err := ioutil.WriteFile(tokenPath, []byte("root"), 0600); err != nil {
+	if err := os.WriteFile(tokenPath, []byte("root"), 0600); err != nil {
 		t.Fatalf("unable to write file : %q", tokenPath)
 	}
 
@@ -173,4 +170,63 @@ func TestGetSecretKvV2(t *testing.T) {
 	require.Equal(t, "bar", s["secret"])
 	require.Equal(t, "bar2", s["secret2"])
 	require.Equal(t, "bar3", s["secret3"])
+}
+
+func TestWithAppRoleV2(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("VAULT_ADDR", v2Endpoint)
+	os.Setenv("VAULT_TOKEN", "root")
+
+	vc, err := CreateClient()
+	require.NoError(t, err)
+
+	addSecret(t, vc, "secret/data/approle", map[string]interface{}{
+		"data": map[string]interface{}{
+			"roleID": "xxxxxx",
+		},
+	})
+
+	roleID, secretID := setupAppRole(t, vc)
+	appRoleClient, err := CreateClientWithAppRole(fmt.Sprint(roleID), fmt.Sprint(secretID))
+	require.NoError(t, err)
+
+	secret, err := appRoleClient.GetSecret("secret/approle")
+	require.NoError(t, err)
+
+	require.Equal(t, "xxxxxx", secret["roleID"])
+}
+
+func setupAppRole(t *testing.T, vc *Client) (string, string) {
+	// Enable approle
+	err := vc.Client.Sys().EnableAuthWithOptions("approle/", &vault.EnableAuthOptions{
+		Type: "approle",
+	})
+	require.NoError(t, err)
+
+	// Create a policy to allow the approle to do whatever
+	err = vc.Client.Sys().PutPolicy("unittest", `
+path "*" {
+    capabilities = ["create", "read", "list", "update", "delete"]
+}
+`)
+	require.NoError(t, err)
+
+	// Create role
+	_, err = vc.Client.Logical().Write("auth/approle/role/roletest", map[string]interface{}{
+		"period":   "5m",
+		"policies": []string{"unittest"},
+	})
+	require.NoError(t, err)
+
+	// Get role_id
+	resp, err := vc.Client.Logical().Read("auth/approle/role/roletest/role-id")
+	require.NoError(t, err)
+	roleID := resp.Data["role_id"]
+
+	// Get secret_id
+	resp, err = vc.Client.Logical().Write("auth/approle/role/roletest/secret-id", map[string]interface{}{})
+	require.NoError(t, err)
+	secretID := resp.Data["secret_id"]
+
+	return fmt.Sprint(roleID), fmt.Sprint(secretID)
 }

@@ -100,3 +100,63 @@ func TestListSecret(t *testing.T) {
 	_, err = client.ListSecretPath("kv-v1-2/not_exist")
 	require.Error(t, err, "The path \"kv-v1-2/not_exist\" does not exist")
 }
+
+func TestWithAppRole(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("VAULT_ADDR", v1Endpoint)
+	os.Setenv("VAULT_TOKEN", "root")
+
+	vc, err := vaultv1.CreateClient()
+	require.NoError(t, err)
+	err = vc.Client.Sys().Mount("kv-v1-3", &vault.MountInput{
+		Type:    "kv",
+		Options: map[string]string{"version": "1"},
+	})
+	require.NoError(t, err, "This should not fail")
+
+	addSecret(t, vc, "kv-v1-3/approle", map[string]interface{}{"roleID": "xxxxxx"})
+
+	roleID, secretID := setupAppRole(t, vc)
+	appRoleClient, err := vaultv1.CreateClientWithAppRole(fmt.Sprint(roleID), fmt.Sprint(secretID))
+	require.NoError(t, err)
+
+	secret, err := appRoleClient.GetSecret("kv-v1-3/approle")
+	require.NoError(t, err)
+
+	require.Equal(t, "xxxxxx", secret["roleID"])
+}
+
+func setupAppRole(t *testing.T, vc *vaultv1.Client) (string, string) {
+	// Enable approle
+	err := vc.Client.Sys().EnableAuthWithOptions("approle/", &vault.EnableAuthOptions{
+		Type: "approle",
+	})
+	require.NoError(t, err)
+
+	// Create a policy to allow the approle to do whatever
+	err = vc.Client.Sys().PutPolicy("unittest", `
+path "*" {
+    capabilities = ["create", "read", "list", "update", "delete"]
+}
+`)
+	require.NoError(t, err)
+
+	// Create role
+	_, err = vc.Client.Logical().Write("auth/approle/role/roletest", map[string]interface{}{
+		"period":   "5m",
+		"policies": []string{"unittest"},
+	})
+	require.NoError(t, err)
+
+	// Get role_id
+	resp, err := vc.Client.Logical().Read("auth/approle/role/roletest/role-id")
+	require.NoError(t, err)
+	roleID := resp.Data["role_id"]
+
+	// Get secret_id
+	resp, err = vc.Client.Logical().Write("auth/approle/role/roletest/secret-id", map[string]interface{}{})
+	require.NoError(t, err)
+	secretID := resp.Data["secret_id"]
+
+	return fmt.Sprint(roleID), fmt.Sprint(secretID)
+}
