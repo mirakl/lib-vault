@@ -1,12 +1,12 @@
 package libvault
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	vault "github.com/hashicorp/vault/api"
 	"github.com/mitchellh/go-homedir"
+
+	vault "github.com/hashicorp/vault/api"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +20,7 @@ func CreateClient() (*vault.Client, error) {
 		}
 		vaultTokenFile := filepath.Join(homePath, ".vault-token")
 		if _, err = os.Stat(vaultTokenFile); err == nil {
-			content, err := ioutil.ReadFile(vaultTokenFile)
+			content, err := os.ReadFile(vaultTokenFile)
 			if err != nil {
 				return nil, errors.Wrap(err, "unable to read .vault-token file")
 			}
@@ -42,5 +42,29 @@ func CreateClient() (*vault.Client, error) {
 	}
 	client.SetToken(vaultToken)
 
+	return client, nil
+}
+
+func CreateClientWithAppRole(roleID, secretID string) (*vault.Client, error) {
+	client, err := vault.NewClient(nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to initialize Vault client")
+	}
+
+	data := map[string]interface{}{
+		"role_id":   roleID,
+		"secret_id": secretID,
+	}
+
+	resp, err := client.Logical().Write("auth/approle/login", data)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to generate token")
+	}
+
+	if resp.Auth == nil {
+		return nil, errors.New("no authentication info returned")
+	}
+
+	client.SetToken(resp.Auth.ClientToken)
 	return client, nil
 }

@@ -24,6 +24,17 @@ func CreateClient() (*Client, error) {
 	}, nil
 }
 
+func CreateClientWithAppRole(roleID, secretID string) (*Client, error) {
+	client, err := libvault.CreateClientWithAppRole(roleID, secretID)
+	if err != nil {
+		return nil, errors.Wrapf(err, "")
+	}
+
+	return &Client{
+		Client: client,
+	}, nil
+}
+
 func (vc *Client) ReadSecret(path string, field string) (string, error) {
 	secret, err := vc.GetSecret(path)
 	if err != nil {
