@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 	}
 
 	options := &dockertest.RunOptions{
-		Repository: "vault",
+		Repository: "hashicorp/vault",
 		Tag:        "latest",
 		Env:        []string{"VAULT_DEV_ROOT_TOKEN_ID=root"},
 	}
