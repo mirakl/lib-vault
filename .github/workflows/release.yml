@@ -25,11 +25,11 @@ jobs:
       security-events: none
       statuses: none
     steps:
-      - name: Set up Go 1.18
+      - name: Set up Go
         # Github Action as the label "Verified creator" https://github.com/marketplace/actions/setup-go-environment
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: '1.22'
         id: go
 
       - name: Check out code into the Go module directory
