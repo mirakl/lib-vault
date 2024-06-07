@@ -1,3 +1,4 @@
+---
 name: Create Release
 
 on:
@@ -27,24 +28,24 @@ jobs:
     steps:
       - name: Set up Go
         # Github Action as the label "Verified creator" https://github.com/marketplace/actions/setup-go-environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: '1.22'
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Go check
-        run: make check
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
 
       - name: Go test
-        run: make test
+        run: go test ./... -v
 
       - name: Release the Go application
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
           args: release --clean
