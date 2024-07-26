@@ -1,8 +1,11 @@
 package libvault
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/mitchellh/go-homedir"
 
@@ -75,5 +78,16 @@ func GetTokenTTLLeft(client *vault.Client) (int, error) {
 		return 0, errors.Wrap(err, "failed to lookup token")
 	}
 
-	return int(secret.Data["ttl"].(float64)), nil
+	ttlRaw, ok := secret.Data["ttl"]
+	if !ok {
+		return 0, fmt.Errorf("token TTL not found in the response")
+	}
+
+	ttlStr := ttlRaw.(json.Number).String()
+	ttl, err := strconv.ParseInt(ttlStr, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse token ttl: %v", err)
+	}
+
+	return int(ttl), nil
 }
