@@ -34,6 +34,15 @@ func CreateClientWithAppRole(roleID, secretID string) (*Client, error) {
 	}, nil
 }
 
+func GetTokenTtlLeft(client *Client) (int, error) {
+	timeLeft, err := libvault.GetTokenTtlLeft(client.Client)
+	if err != nil {
+		return 0, errors.Wrapf(err, "")
+	}
+
+	return timeLeft, nil
+}
+
 func (vc *Client) ListSecretPath(path string) ([]string, error) {
 	s, err := vc.Client.Logical().List(path)
 	if err != nil {

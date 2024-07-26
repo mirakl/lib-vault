@@ -68,3 +68,12 @@ func CreateClientWithAppRole(roleID, secretID string) (*vault.Client, error) {
 	client.SetToken(resp.Auth.ClientToken)
 	return client, nil
 }
+
+func GetTokenTtlLeft(client *vault.Client) (int, error) {
+	secret, err := client.Auth().Token().LookupSelf()
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to lookup token")
+	}
+
+	return int(secret.Data["ttl"].(float64)), nil
+}
