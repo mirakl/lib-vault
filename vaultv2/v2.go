@@ -35,6 +35,15 @@ func CreateClientWithAppRole(roleID, secretID string) (*Client, error) {
 	}, nil
 }
 
+func GetTokenTTLLeft(client *Client) (int, error) {
+	timeLeft, err := libvault.GetTokenTTLLeft(client.Client)
+	if err != nil {
+		return 0, errors.Wrapf(err, "")
+	}
+
+	return timeLeft, nil
+}
+
 func (vc *Client) ReadSecret(path string, field string) (string, error) {
 	secret, err := vc.GetSecret(path)
 	if err != nil {
