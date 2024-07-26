@@ -34,8 +34,8 @@ func CreateClientWithAppRole(roleID, secretID string) (*Client, error) {
 	}, nil
 }
 
-func GetTokenTtlLeft(client *Client) (int, error) {
-	timeLeft, err := libvault.GetTokenTtlLeft(client.Client)
+func GetTokenTTLLeft(client *Client) (int, error) {
+	timeLeft, err := libvault.GetTokenTTLLeft(client.Client)
 	if err != nil {
 		return 0, errors.Wrapf(err, "")
 	}
