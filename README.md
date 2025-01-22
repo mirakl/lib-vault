@@ -13,7 +13,7 @@ For KV v1:
 
 ```go
 
-import "github.com/mirakl/lib-vault/vaultv1"
+import "github.com/mirakl/lib-vault/v2/vaultv2"
 
 client, err := vaultv1.CreateClient()
 ```
@@ -21,7 +21,7 @@ For KV v2:
 
 ```go
 
-import "github.com/mirakl/lib-vault/vaultv2"
+import "github.com/mirakl/lib-vault/v2/vaultv2"
 
 client, err := vaultv2.CreateClient()
 ```
