@@ -13,7 +13,7 @@ For KV v1:
 
 ```go
 
-import "github.com/mirakl/lib-vault/v2/vaultv2"
+import "github.com/mirakl/lib-vault/v2/vaultv1"
 
 client, err := vaultv1.CreateClient()
 ```
